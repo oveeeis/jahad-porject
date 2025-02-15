@@ -1,0 +1,7 @@
+#crating database user
+#docker exec -it mysql-db mysql -u root -p
+CREATE DATABASE mydatabase;
+CREATE USER 'myuser'@'%' IDENTIFIED BY 'mypassword';
+GRANT ALL PRIVILEGES ON mydatabase.* TO 'myuser'@'%';
+FLUSH PRIVILEGES;
+EXIT;
