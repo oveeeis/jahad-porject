@@ -1,0 +1,44 @@
+#phpmyadmin docker  compose  file
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
+#docker-compose up -d --build
+
+#Virtual Host#
+#vim  nano apache-config/mywebsite.conf
+
+<VirtualHost *:80>
+    ServerAdmin admin@example.com
+    ServerName example.com
+    ServerAlias www.example.com
+    DocumentRoot /var/www/html
+
+    <Directory /var/www/html>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+
+#vim  docker-compose.yml
+
+    volumes:
+      - .:/var/www/html
+      - ./apache-config/mywebsite.conf:/etc/apache2/sites-available/000-default.conf
+      
+#docker-compose up -d --build
+
