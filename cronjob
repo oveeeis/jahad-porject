@@ -1,0 +1,32 @@
+##cronjob##
+mkdir -p /opt/backup/mysql
+mkdir -p /opt/backup/files
+vim   /opt/backup/backup.sh
+#!/bin/bash
+
+# متغیرهای مهم
+DATE=$(date +%F-%H-%M)
+BACKUP_DIR="/opt/backup"
+MYSQL_CONTAINER="mysql"
+DB_NAME="your_database"
+DB_USER="your_user"
+DB_PASS="your_password"
+RETENTION_DAYS=7
+
+# بکاپ از دیتابیس
+docker exec $MYSQL_CONTAINER mysqldump -u $DB_USER -p$DB_PASS $DB_NAME > $BACKUP_DIR/mysql/db-backup-$DATE.sql
+
+# بکاپ از فایل‌های سایت
+tar -czf $BACKUP_DIR/files/site-backup-$DATE.tar.gz /var/www/html
+
+# حذف بکاپ‌های قدیمی‌تر از ۷ روز
+find $BACKUP_DIR/mysql -type f -mtime +$RETENTION_DAYS -delete
+find $BACKUP_DIR/files -type f -mtime +$RETENTION_DAYS -delete
+
+# پیام پایان
+echo "Backup completed at $DATE"
+####
+chmod +x /opt/backup/backup.sh
+/opt/backup/backup.sh
+crontab -e
+0 3 * * * /opt/backup/backup.sh >> /opt/backup/backup.log 2>&1
